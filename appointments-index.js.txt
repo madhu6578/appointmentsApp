@@ -1,0 +1,119 @@
+import {Component} from 'react'
+import {v4 as uuidv4} from 'uuid'
+import {format} from 'date-fns'
+import AppointmentItem from '../AppointmentItem'
+
+class Appointments extends Component {
+  state = {
+    appointmentsList: [],
+    title: '',
+    date: '',
+  }
+
+  onChangeTitle = event => {
+    this.setState({title: event.target.value})
+  }
+
+  onChangeTitle = event => {
+    this.setState({date: event.target.value})
+  }
+
+  isFavourateAppointmentItem = id => {
+    this.setState(prevState => ({
+      appointmentsList: prevState.appointmentsList.map(eachAppointment => {
+        if (id === eachAppointment.id) {
+          return {...eachAppointment, isFavourate: !eachAppointment.isFavourate}
+        }
+        return eachAppointment
+      }),
+    }))
+  }
+
+  addAppointment = event => {
+    event.preventDefault()
+    const {title, date} = this.state
+    const newAppointment = {
+      id: uuidv4(),
+      title,
+      date,
+      isFavourate: false,
+    }
+
+    this.setState(prevState => ({
+      appointmentsList: [...prevState.appointmentsList, newAppointment],
+      title: '',
+      date: '',
+    }))
+  }
+
+  render() {
+    const {appointmentsList, date, title} = this.state
+    const dateFormat = format(new Date(date), 'dd MMMM yyyy, EEEE')
+
+    return (
+      <div className="app-container">
+        <div className="home-container">
+          <div className="form-container">
+            <form className="form" onSubmit={this.addAppointment}>
+              <h1 className="heading"> Add Appointments</h1>
+              <label htmlFor="titleForm" className="labelTitle">
+                TITLE
+              </label>
+              <input
+                type="text"
+                id="titleForm"
+                className="titleInput"
+                value={title}
+                placeholder="Title"
+                onChange={this.onChangeTitle}
+              />
+              <label htmlFor="dateForm" className="labelDate">
+                DATE
+              </label>
+              <input
+                type="date"
+                id="dateForm"
+                className="dateInput"
+                value={date}
+                placeholder="dd/mm/yyyy"
+                onChange={this.onChangeDate}
+              />
+              <button type="submit" className="btn">
+                Add
+              </button>
+            </form>
+            <img
+              className="app-img"
+              src="https://assets.ccbp.in/frontend/react-js/appointments-app/appointments-img.png"
+              alt="appointments"
+            />
+          </div>
+          <hr className="separator" />
+          <div className="appoint-item-container">
+            <div className="above-item">
+              <h2 className="item-heading">Appointments</h2>
+              <button
+                className="starred-btn"
+                type="button"
+                onClick={this.onChangeAppointList}
+              >
+                Starred
+              </button>
+            </div>
+            <ul className="appoints-container">
+              {appointmentsList.map(eachAppointment => (
+                <AppointmentItem
+                  key={eachAppointment.id}
+                  appointmentDetails={eachAppointment}
+                  isFavourateAppointmentItem={this.isFavourateAppointmentItem}
+                  dateFormat={dateFormat}
+                />
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+export default Appointments
